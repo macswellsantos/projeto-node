@@ -1,13 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const app = express();
 app.use(bodyParser.json({limit: '50mb'}));
 
-pp.listen(80, ()=>{
+app.listen(80, ()=>{
     console.log("Server running on port 80");
 });
 
