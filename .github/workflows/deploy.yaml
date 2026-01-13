@@ -50,6 +50,8 @@ jobs:
           ssh -i chave-node.pem -o StrictHostKeyChecking=no ec2-user@$PUBLIC_IP << 'EOF'
             aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 320514709580.dkr.ecr.us-east-2.amazonaws.com
             docker pull 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
+            docker stop node || true
+            docker rm node || true
             docker run -d -p 80:80 --name node 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
             docker ps
           EOF
