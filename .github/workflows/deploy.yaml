@@ -42,6 +42,12 @@ jobs:
       INSTANCE_KEY: ${{secrets.INSTANCE_KEY}}
     runs-on: ubuntu-latest
     steps:
+     - name: Configure AWS Credentials
+       uses: aws-actions/configure-aws-credentials@v4.3.1
+       with:
+         role-to-assume: arn:aws:iam::320514709580:role/GitHubActionsRepoApp
+         aws-region: us-east-2
+
      - name: Get EC2 IP from SSM
        run: |
          EC2_IP=$(aws ssm get-parameter \
