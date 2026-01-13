@@ -34,3 +34,23 @@ jobs:
           docker build -t my-app:v1.0 .
           docker tag my-app:v1.0 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
           docker push 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
+  
+  job2:
+    name: deploy_ec2
+    needs: job1
+    env:
+      INSTANCE_KEY: ${{secrets.INSTANCE_KEY}}
+      PUBLIC_IP: ${{secrets.PUBLIC_IP}}
+    runs-on: ubuntu-latest
+    steps:
+     - name: Deploy to EC2 via SSH
+       run: |
+          echo "$INSTANCE_KEY" > chave-node.pem
+          chmod 400 chave-node.pem
+          ssh -i chave-node.pem -o StrictHostKeyChecking=no ec2-user@$PUBLIC_IP << 'EOF'
+            aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin 320514709580.dkr.ecr.us-east-2.amazonaws.com
+            docker pull 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
+            docker run -d -p 80:80 --name node 320514709580.dkr.ecr.us-east-2.amazonaws.com/node-prod:v1.0
+            docker ps
+          EOF
+          rm -f chave-node.pem
